@@ -11,8 +11,10 @@ app.use(helmet());
 app.use(compression());
 
 // init db
-
-// init router
+require("./bds/init.mongodb");
+const { checkOverLoad } = require("./helpers/check.connect");
+// checkOverLoad();
+// init routes
 
 // handle error
 
