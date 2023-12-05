@@ -1,9 +1,8 @@
 "use strict";
-
+require("dotenv").config();
 const mongoose = require("mongoose");
 
-const uri =
-  "mongodb+srv://vienpham2019:Vp$1721998@cluster0.04sqiqj.mongodb.net/?retryWrites=true&w=majority";
+const uri = process.env.DB_URL;
 
 class Database {
   constructor() {
@@ -20,7 +19,9 @@ class Database {
       }
 
       mongoose
-        .connect(uri)
+        .connect(uri, {
+          maxPoolSize: 50, // default 5
+        })
         .then(() => {
           console.log("Connected to MongoDB PRO");
         })

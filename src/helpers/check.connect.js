@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 const os = require("os");
 const process = require("process");
-const _SECONDS = 5000;
+const _SECONDS = 5000; // 5 seconds
 // count connect
 const countConnect = () => {
   const numberConnection = mongoose.connections.length;
