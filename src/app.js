@@ -18,10 +18,24 @@ app.use(
 
 // init db
 require("./bds/init.mongodb");
-// const { checkOverLoad } = require("./helpers/check.connect");
-// checkOverLoad();
+
 // init routes
 app.use("", require("./routes"));
+
 // handle error
+app.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
+});
+
+app.use((error, req, res, next) => {
+  const statusError = error.status || 500;
+  return res.status(statusError).json({
+    status: "error",
+    code: statusError,
+    message: error.message || "Internal Server Errror",
+  });
+});
 
 module.exports = app;
