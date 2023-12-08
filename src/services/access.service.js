@@ -78,7 +78,7 @@ class AccessService {
           publicKey,
           privateKey
         );
-
+        console.log(tokens);
         return {
           code: 201,
           metadata: {
