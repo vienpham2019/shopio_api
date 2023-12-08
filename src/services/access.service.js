@@ -4,6 +4,7 @@ const byscrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
 const { createTokenPair } = require("../auth/authUtil");
+const { getInfoData } = require("../utils/index");
 
 const RoleShop = {
   SHOP: "00001",
@@ -36,16 +37,31 @@ class AccessService {
 
       if (newShop) {
         // created private key and public key
-        const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
-          modulusLength: 4096,
-        });
+        // const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+        //   modulusLength: 4096,
+        //   publicKeyEncoding: {
+        //     // pkcs1 stand for Public key cryptoGraphy standards
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        //   privateKeyEncoding: {
+        //     // pkcs1 stand for Public key cryptoGraphy standards
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        // });
 
-        console.log(privateKey, publicKey); // save collection key store
+        const privateKey = crypto.randomBytes(64).toString("hex");
+        const publicKey = crypto.randomBytes(64).toString("hex");
+
+        // console.log(privateKey, publicKey); // save collection key store
 
         const publicKeyString = await KeyTokenService.createKeyToken({
           userId: newShop._id,
           publicKey,
+          privateKey,
         });
+
         if (!publicKeyString) {
           return {
             code: "xxx",
@@ -62,12 +78,14 @@ class AccessService {
           publicKey,
           privateKey
         );
-        console.log(tokens);
 
         return {
           code: 201,
           metadata: {
-            shop: newShop,
+            shop: getInfoData({
+              fileds: ["_id", "name", "email"],
+              object: newShop,
+            }),
             tokens,
           },
         };
