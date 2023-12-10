@@ -26,30 +26,16 @@ class AccessService {
     - If we detect refresh token already use we delete all refresh token and access token 
     and user have to login back to have new refresh token and access token. 
   */
-  static handlerRefreshToken = async (refreshToken) => {
-    // Check for used token
-    const foundToken = await KeyTokenService.findByRefreshTokenUsed(
-      refreshToken
-    );
-
-    if (foundToken) {
-      // Decode for user id
-      const { userId } = await verifyJWT(refreshToken, foundToken.privateKey);
-      console.log("user id ::", userId);
-      // delete both token
+  static handlerRefreshToken = async ({ keyStore, user, refreshToken }) => {
+    const { userId, email } = user;
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
       await KeyTokenService.deleteKeyById(userId);
       throw new ForbiddenError("Something wrong happed! Please re-login");
     }
 
-    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
-    if (!holderToken) {
+    if (keyStore.refreshToken !== refreshToken) {
       throw new AuthFailureError("User not registered");
     }
-
-    const { userId, email } = await verifyJWT(
-      refreshToken,
-      holderToken.privateKey
-    );
 
     const foundUser = await findByEmail({ email });
     if (!foundUser) {
@@ -62,18 +48,18 @@ class AccessService {
         userId,
         email,
       },
-      holderToken.publicKey,
-      holderToken.privateKey
+      keyStore.publicKey,
+      keyStore.privateKey
     );
 
     // update token
     await KeyTokenService.updateRefreshToken({
-      token: holderToken,
+      token: keyStore,
       newRefreshToken: tokens.refreshToken,
     });
 
     return {
-      user: { userId, email },
+      user,
       tokens,
     };
   };

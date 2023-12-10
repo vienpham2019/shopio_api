@@ -8,30 +8,30 @@ const COLLECTION_NAME = "Products";
 // Declare the Schema of the Mongo model
 const productSchema = new Schema(
   {
-    name: {
+    product_name: {
       type: String,
       require: true,
     },
-    thumbnail: {
+    product_thumbnail: {
       type: String,
       require: true,
     },
-    description: String,
-    price: {
+    product_description: String,
+    product_price: {
       type: Number,
       require: true,
     },
-    quantity: {
+    product_quantity: {
       type: Number,
       require: true,
     },
-    type: {
+    product_type: {
       type: String,
       require: true,
       enum: ["Electronics", "Clothings", "Furnitures"],
     },
-    user: { type: Schema.Types.ObjectId, ref: "User" },
-    attributes: {
+    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
+    product_attributes: {
       type: Schema.Types.Mixed,
       require: true,
     },

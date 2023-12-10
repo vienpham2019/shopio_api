@@ -52,7 +52,6 @@ class KeyTokenService {
   };
 
   static updateRefreshToken = async ({ token, newRefreshToken }) => {
-    console.log("token::", token);
     return await keytokenModel
       .updateMany(
         { _id: new Types.ObjectId(token._id) },

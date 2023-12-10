@@ -9,6 +9,7 @@ const HEADER = {
   API_KEY: "x-api-key",
   CLIENT_ID: "x-client-id",
   AUTHORIZATION: "athorization",
+  REFRESHTOKEN: "refreshtoken",
 };
 
 const createTokenPair = async (payload, publicKey, privateKey) => {
@@ -30,29 +31,48 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
 };
 
 const authentication = asyncHandler(async (req, res, next) => {
-  // 1 - Check user id missing ???
+  // Check user id missing ???
   const userId = req.headers[HEADER.CLIENT_ID];
   if (!userId) {
     throw new AuthFailureError("Invalid Request");
   }
-  // 2 - get accesstoken
+  // get accesstoken
   const keyStore = await findByUserId({ userId });
   if (!keyStore) {
     throw new NotFoundError("Not found keyStore");
   }
-  // 3 - verify access token
+  // verify refresh token
+  const refreshToken = req.headers[HEADER.REFRESHTOKEN];
+  if (refreshToken) {
+    try {
+      // check keyStore with user id
+      const decodeUser = JWT.verify(refreshToken, keyStore.privateKey);
+      if (userId != decodeUser.userId) {
+        throw new AuthFailureError("Invalid UserId");
+      }
+      // Ok all then return next
+      req.keyStore = keyStore;
+      req.user = decodeUser;
+      req.refreshToken = refreshToken;
+      return next();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // verify access token
   const accessToken = req.headers[HEADER.AUTHORIZATION];
   if (!accessToken) {
     throw new AuthFailureError("Invalid Request");
   }
 
   try {
-    // 4 - check keyStore with user id
+    // check keyStore with user id
     const decodeUser = JWT.verify(accessToken, keyStore.publicKey);
     if (userId != decodeUser.userId) {
       throw new AuthFailureError("Invalid UserId");
     }
-    // 5 - Ok all then return next
+    // Ok all then return next
     req.keyStore = keyStore;
     return next();
   } catch (error) {
