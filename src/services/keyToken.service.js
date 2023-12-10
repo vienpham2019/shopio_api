@@ -37,8 +37,43 @@ class KeyTokenService {
       .lean();
   };
 
-  static removeKeyById = async (id) => {
-    return await keytokenModel.deleteOne(id);
+  static removeKeyTokenById = async (id) => {
+    return await keytokenModel.deleteOne(id).lean();
+  };
+
+  static findByRefreshTokenUsed = async (refreshToken) => {
+    return await keytokenModel
+      .findOne({ refreshTokensUsed: refreshToken })
+      .lean();
+  };
+
+  static findByRefreshToken = async (refreshToken) => {
+    return await keytokenModel.findOne({ refreshToken }).lean();
+  };
+
+  static updateRefreshToken = async ({ token, newRefreshToken }) => {
+    console.log("token::", token);
+    return await keytokenModel
+      .updateMany(
+        { _id: new Types.ObjectId(token._id) },
+        {
+          $set: {
+            refreshToken: newRefreshToken,
+          },
+          $addToSet: {
+            refreshTokensUsed: token.refreshToken,
+          },
+        }
+      )
+      .lean();
+  };
+
+  static deleteKeyById = async (userId) => {
+    return await keytokenModel
+      .deleteOne({
+        user: new Types.ObjectId(userId),
+      })
+      .lean();
   };
 }
 

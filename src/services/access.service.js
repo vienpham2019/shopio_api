@@ -3,9 +3,13 @@ const userModel = require("../models/user.model");
 const byscrypt = require("bcrypt");
 const crypto = require("crypto");
 const KeyTokenService = require("./keyToken.service");
-const { createTokenPair } = require("../auth/authUtil");
+const { createTokenPair, verifyJWT } = require("../auth/authUtil");
 const { getInfoData } = require("../utils/index");
-const { BadRequestError, AuthFailureError } = require("../core/error.response");
+const {
+  BadRequestError,
+  AuthFailureError,
+  ForbiddenError,
+} = require("../core/error.response");
 const { findByEmail } = require("./shop.service");
 
 const RoleShop = {
@@ -16,8 +20,68 @@ const RoleShop = {
 };
 
 class AccessService {
+  /*
+    - This function for create new refresh token and access token when access token is expiered
+    and put that refresh token in to use token of that user. 
+    - If we detect refresh token already use we delete all refresh token and access token 
+    and user have to login back to have new refresh token and access token. 
+  */
+  static handlerRefreshToken = async (refreshToken) => {
+    // Check for used token
+    const foundToken = await KeyTokenService.findByRefreshTokenUsed(
+      refreshToken
+    );
+
+    if (foundToken) {
+      // Decode for user id
+      const { userId } = await verifyJWT(refreshToken, foundToken.privateKey);
+      console.log("user id ::", userId);
+      // delete both token
+      await KeyTokenService.deleteKeyById(userId);
+      throw new ForbiddenError("Something wrong happed! Please re-login");
+    }
+
+    const holderToken = await KeyTokenService.findByRefreshToken(refreshToken);
+    if (!holderToken) {
+      throw new AuthFailureError("User not registered");
+    }
+
+    const { userId, email } = await verifyJWT(
+      refreshToken,
+      holderToken.privateKey
+    );
+
+    const foundUser = await findByEmail({ email });
+    if (!foundUser) {
+      throw new AuthFailureError("User not registered");
+    }
+
+    // Create new refresh and access token
+    const tokens = await createTokenPair(
+      {
+        userId,
+        email,
+      },
+      holderToken.publicKey,
+      holderToken.privateKey
+    );
+
+    // update token
+    await KeyTokenService.updateRefreshToken({
+      token: holderToken,
+      newRefreshToken: tokens.refreshToken,
+    });
+
+    return {
+      user: { userId, email },
+      tokens,
+    };
+  };
+
   static logOut = async (keyStore) => {
-    const deleteKeyStore = await KeyTokenService.removeKeyById(keyStore._id);
+    const deleteKeyStore = await KeyTokenService.removeKeyTokenById(
+      keyStore._id
+    );
     return deleteKeyStore;
   };
   /*
