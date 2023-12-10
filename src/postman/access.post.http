@@ -25,3 +25,24 @@ x-client-id: 657499cd98e6840bca4cd98c
 athorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTc0OTljZDk4ZTY4NDBiY2E0Y2Q5OGMiLCJlbWFpbCI6InNob3B0aXBqczFAZ21haWwuY29tIiwiaWF0IjoxNzAyMjMzNjkzLCJleHAiOjE3MDI0MDY0OTN9.XYB9ehbzrrQ-4-F3iVrAesqM-RXslSDOXyWnTlLw8BM
 refreshtoken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTc0OTljZDk4ZTY4NDBiY2E0Y2Q5OGMiLCJlbWFpbCI6InNob3B0aXBqczFAZ21haWwuY29tIiwiaWF0IjoxNzAyMjMzNjkzLCJleHAiOjE3MDI4Mzg0OTN9.Mtq8BBKRTBquD3cs05DCNalndFoLJxdC6LNDAzgD3Tc
 
+### create product 
+POST {{url_dev}}/product
+Content-Type: application/json
+x-api-key: de6b9542b514d3530eeca7ce6c31dfb8af9d60eae3a6f2a18232fb77c61c9af21f9da66c30977757c8a3f47c4e75f44e88711021be78f23057037ab0c7d32313
+x-client-id: 657499cd98e6840bca4cd98c
+athorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTc0OTljZDk4ZTY4NDBiY2E0Y2Q5OGMiLCJlbWFpbCI6InNob3B0aXBqczFAZ21haWwuY29tIiwiaWF0IjoxNzAyMjMzNjkzLCJleHAiOjE3MDI0MDY0OTN9.XYB9ehbzrrQ-4-F3iVrAesqM-RXslSDOXyWnTlLw8BM
+
+{
+    "product_name": "New Jean",
+    "product_thumbnail": "Product_thumb",
+    "product_description": "product_des" ,
+    "product_price": 10,
+    "product_quantity": 20,
+    "product_type": "Clothing",
+    "product_shop": "657499cd98e6840bca4cd98c",
+    "product_attributes": {
+        "brand": "Levis", 
+        "size": "L", 
+        "material": "Denim"
+    },
+}
