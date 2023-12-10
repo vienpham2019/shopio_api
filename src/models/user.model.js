@@ -1,12 +1,12 @@
 "use strict";
 
-const mongoose = require("mongoose"); // Erase if already required
+const { Schema, model } = require("mongoose"); // Erase if already required
 
 const DOCUMENT_NAME = "User";
 const COLLECTION_NAME = "Users";
 
 // Declare the Schema of the Mongo model
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
   {
     name: {
       type: String,
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
       default: "inactive",
     },
     verify: {
-      type: mongoose.Schema.Types.Boolean,
+      type: Schema.Types.Boolean,
       default: false,
     },
     roles: {
@@ -43,4 +43,4 @@ const userSchema = new mongoose.Schema(
 );
 
 //Export the model
-module.exports = mongoose.model(DOCUMENT_NAME, userSchema);
+module.exports = model(DOCUMENT_NAME, userSchema);
