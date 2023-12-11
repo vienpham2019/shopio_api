@@ -16,7 +16,9 @@ const {
   searchProductByUser,
   findAllProducts,
   findProduct,
+  updateProductById,
 } = require("../models/repositories/product.repo");
+const { removeUndefineObject, removeNestedObjectParser } = require("../utils");
 
 // define Factory class to create product
 class ProductFactory {
@@ -34,6 +36,16 @@ class ProductFactory {
     return new productClass(payload).createProduct();
   }
 
+  // PATCH //
+  static async updateProduct(type, product_id, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+    if (!productClass) {
+      throw new BadRequestError(`Invalid Product Type ${type}`);
+    }
+    return new productClass(payload).updateProduct(product_id);
+  }
+  // END PATCH //
+
   // PUT //
   static async publishProductByShop({ product_shop, product_id }) {
     return await publishProductByShop({ product_shop, product_id });
@@ -41,9 +53,7 @@ class ProductFactory {
   static async unPublishProductByShop({ product_shop, product_id }) {
     return await unPublishProductByShop({ product_shop, product_id });
   }
-  static async updateProduct({ keySearch }) {
-    return await searchProductByUser({ keySearch });
-  }
+
   // End PUT //
 
   // QUERY //
@@ -112,6 +122,11 @@ class Product {
       _id: product_id,
     });
   }
+
+  // Update Product
+  async updateProduct(productId, payload) {
+    return await updateProductById({ productId, payload, model: product });
+  }
 }
 
 //   Define sub-class for diffrent product types Clothing
@@ -131,6 +146,26 @@ class Clothing extends Product {
     }
 
     return newProduct;
+  }
+
+  async updateProduct(productId) {
+    // remove attr has null or undefined
+    const objectParams = removeUndefineObject(this);
+    // check for relate update attr
+    if (objectParams.product_attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        payload: removeNestedObjectParser(objectParams.product_attributes),
+        model: clothing,
+      });
+    }
+
+    const updateProduct = await super.updateProduct(
+      productId,
+      removeNestedObjectParser(objectParams)
+    );
+    return updateProduct;
   }
 }
 
@@ -169,6 +204,26 @@ class Furniture extends Product {
     }
 
     return newProduct;
+  }
+
+  async updateProduct(productId) {
+    // remove attr has null or undefined
+    const objectParams = removeUndefineObject(this);
+    // check for relate update attr
+    if (objectParams?.product_attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        payload: removeUndefineObject(objectParams.product_attributes),
+        model: furniture,
+      });
+    }
+
+    const updateProduct = await super.updateProduct(
+      productId,
+      removeNestedObjectParser(objectParams)
+    );
+    return updateProduct;
   }
 }
 
