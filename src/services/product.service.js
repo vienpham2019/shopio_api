@@ -9,10 +9,13 @@ const {
 
 const { BadRequestError } = require("../core/error.response");
 const {
-  queryProduct,
+  findAllDraftsForShop,
+  findAllPublishsForShop,
   publishProductByShop,
   unPublishProductByShop,
   searchProductByUser,
+  findAllProducts,
+  findProduct,
 } = require("../models/repositories/product.repo");
 
 // define Factory class to create product
@@ -38,22 +41,45 @@ class ProductFactory {
   static async unPublishProductByShop({ product_shop, product_id }) {
     return await unPublishProductByShop({ product_shop, product_id });
   }
+  static async updateProduct({ keySearch }) {
+    return await searchProductByUser({ keySearch });
+  }
   // End PUT //
 
   // QUERY //
   static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
     const query = { product_shop, isDraft: true };
-    return await queryProduct({ query, limit, skip });
+    return await findAllDraftsForShop({ query, limit, skip });
   }
 
   static async findAllPublishsForShop({ product_shop, limit = 50, skip = 0 }) {
     const query = { product_shop, isPublish: true };
-    return await queryProduct({ query, limit, skip });
+    return await findAllPublishsForShop({ query, limit, skip });
   }
 
   static async searchProductByUser({ keySearch }) {
     return await searchProductByUser({ keySearch });
   }
+
+  static async findAllProducts({
+    limit = 50,
+    sort = "ctime",
+    page = 1,
+    filter = { isPublished: true },
+  }) {
+    return await findAllProducts({
+      limit,
+      sort,
+      page,
+      filter,
+      select: ["product_name", "product_price", "product_thumbnail"],
+    });
+  }
+
+  static async findProduct({ product_id }) {
+    return await findProduct({ product_id, unSelect: ["__v"] });
+  }
+
   // END QUERY //
 }
 
