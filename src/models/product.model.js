@@ -10,31 +10,31 @@ const productSchema = new Schema(
   {
     product_name: {
       type: String,
-      require: true,
+      required: true,
     },
     product_thumbnail: {
       type: String,
-      require: true,
+      required: true,
     },
     product_description: String,
     product_slug: String,
     product_price: {
       type: Number,
-      require: true,
+      required: true,
     },
     product_quantity: {
       type: Number,
-      require: true,
+      required: true,
     },
     product_type: {
       type: String,
-      require: true,
+      required: true,
       enum: ["Electronic", "Clothing", "Furniture"],
     },
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
     product_attributes: {
       type: Schema.Types.Mixed,
-      require: true,
+      required: true,
     },
     product_rating: {
       type: Number,
@@ -77,9 +77,9 @@ productSchema.pre("save", function (next) {
 // define the product type = clothing
 const clothingSchema = new Schema(
   {
-    brand: { type: String, require: true },
-    size: String,
-    material: String,
+    brand: { type: String, required: true },
+    size: { type: String, required: true },
+    material: { type: String, required: true },
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
@@ -91,7 +91,7 @@ const clothingSchema = new Schema(
 // define the product type = electronic
 const electronicSchema = new Schema(
   {
-    manufacturer: { type: String, require: true },
+    manufacturer: { type: String, required: true },
     model: String,
     color: String,
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
@@ -105,9 +105,9 @@ const electronicSchema = new Schema(
 // define the product type = furniture
 const furnitureSchema = new Schema(
   {
-    brand: { type: String, require: true },
-    size: String,
-    material: String,
+    brand: { type: String, required: true },
+    size: { type: String, required: true },
+    material: { type: String, required: true },
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {

@@ -26,11 +26,13 @@ const removeUndefineObject = (obj) => {
 const removeNestedObjectParser = (obj) => {
   Object.keys(obj).forEach((k) => {
     if (typeof obj[k] === "object" && !Array.isArray(obj[k])) {
-      obj[k] = removeUndefineObject(obj[k]);
-      if (isEmptyObject(obj[k])) delete obj[k];
+      const res = removeUndefineObject(obj[k]);
+      Object.keys(res).forEach((a) => {
+        obj[`${k}.${a}`] = res[a];
+      });
+      delete obj[k];
     }
   });
-  console.log(obj);
   return obj;
 };
 

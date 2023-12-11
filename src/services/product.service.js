@@ -19,6 +19,7 @@ const {
   updateProductById,
 } = require("../models/repositories/product.repo");
 const { removeUndefineObject, removeNestedObjectParser } = require("../utils");
+const { mongoose } = require("mongoose");
 
 // define Factory class to create product
 class ProductFactory {
@@ -38,6 +39,9 @@ class ProductFactory {
 
   // PATCH //
   static async updateProduct(type, product_id, payload) {
+    if (!mongoose.isValidObjectId(product_id)) {
+      throw new BadRequestError("Invalid product Id");
+    }
     const productClass = ProductFactory.productRegistry[type];
     if (!productClass) {
       throw new BadRequestError(`Invalid Product Type ${type}`);
@@ -87,6 +91,9 @@ class ProductFactory {
   }
 
   static async findProduct({ product_id }) {
+    if (!mongoose.isValidObjectId(product_id)) {
+      throw new BadRequestError("Invalid product Id");
+    }
     return await findProduct({ product_id, unSelect: ["__v"] });
   }
 
@@ -156,7 +163,7 @@ class Clothing extends Product {
       // update child
       await updateProductById({
         productId,
-        payload: removeNestedObjectParser(objectParams.product_attributes),
+        payload: removeUndefineObject(objectParams.product_attributes),
         model: clothing,
       });
     }
@@ -175,6 +182,7 @@ class Electronic extends Product {
       ...this.product_attributes,
       product_shop: this.product_shop,
     });
+
     if (!newElectronic) {
       throw new BadRequestError("Create new Electronic error");
     }
@@ -185,6 +193,26 @@ class Electronic extends Product {
     }
 
     return newProduct;
+  }
+
+  async updateProduct(productId) {
+    // remove attr has null or undefined
+    const objectParams = removeUndefineObject(this);
+    // check for relate update attr
+    if (objectParams?.product_attributes) {
+      // update child
+      await updateProductById({
+        productId,
+        payload: removeUndefineObject(objectParams.product_attributes),
+        model: electronic,
+      });
+    }
+
+    const updateProduct = await super.updateProduct(
+      productId,
+      removeNestedObjectParser(objectParams)
+    );
+    return updateProduct;
   }
 }
 

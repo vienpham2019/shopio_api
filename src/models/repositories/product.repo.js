@@ -8,6 +8,7 @@ const {
   furniture,
 } = require("../../models/product.model");
 const { getSelectData, getUnSelectData } = require("../../utils");
+const { BadRequestError } = require("../../core/error.response");
 
 const searchProductByUser = async ({ keySearch }) => {
   const regexSearch = new RegExp(keySearch);
@@ -106,10 +107,12 @@ const updateProductById = async ({
   model,
   isNew = true,
 }) => {
-  return await model
-    //  { new: true } Option to return the updated document
+  const updateProd = await model
     .findByIdAndUpdate(productId, payload, { new: isNew })
     .lean();
+
+  if (updateProd === null) throw new BadRequestError("Invalid product id");
+  return updateProd;
 };
 
 module.exports = {
