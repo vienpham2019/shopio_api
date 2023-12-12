@@ -83,7 +83,7 @@ const clothingSchema = new Schema(
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
-    timeStamps: true,
+    timestamps: true,
     collection: "Clothing",
   }
 );
@@ -97,7 +97,7 @@ const electronicSchema = new Schema(
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
-    timeStamps: true,
+    timestamps: true,
     collection: "Electronic",
   }
 );
@@ -111,7 +111,7 @@ const furnitureSchema = new Schema(
     product_shop: { type: Schema.Types.ObjectId, ref: "User" },
   },
   {
-    timeStamps: true,
+    timestamps: true,
     collection: "Furniture",
   }
 );

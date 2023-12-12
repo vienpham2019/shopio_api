@@ -18,7 +18,7 @@ const {
   findProduct,
   updateProductById,
 } = require("../models/repositories/product.repo");
-const { removeUndefineObject, removeNestedObjectParser } = require("../utils");
+const { removeUndefinedNull } = require("../utils");
 const { mongoose } = require("mongoose");
 
 // define Factory class to create product
@@ -157,22 +157,21 @@ class Clothing extends Product {
 
   async updateProduct(productId) {
     // remove attr has null or undefined
-    const objectParams = removeUndefineObject(this);
+    const objectParams = this;
     // check for relate update attr
     if (objectParams.product_attributes) {
       // update child
       await updateProductById({
         productId,
-        payload: removeUndefineObject(objectParams.product_attributes),
+        payload: removeUndefinedNull(objectParams.product_attributes),
         model: clothing,
       });
     }
 
-    const updateProduct = await super.updateProduct(
+    return await super.updateProduct(
       productId,
-      removeNestedObjectParser(objectParams)
+      removeUndefinedNull(objectParams)
     );
-    return updateProduct;
   }
 }
 
@@ -197,22 +196,21 @@ class Electronic extends Product {
 
   async updateProduct(productId) {
     // remove attr has null or undefined
-    const objectParams = removeUndefineObject(this);
-    // check for relate update attr
+    const objectParams = this;
+    //check for relate update attr
     if (objectParams?.product_attributes) {
       // update child
       await updateProductById({
         productId,
-        payload: removeUndefineObject(objectParams.product_attributes),
+        payload: removeUndefinedNull(objectParams.product_attributes),
         model: electronic,
       });
     }
 
-    const updateProduct = await super.updateProduct(
+    return await super.updateProduct(
       productId,
-      removeNestedObjectParser(objectParams)
+      removeUndefinedNull(objectParams)
     );
-    return updateProduct;
   }
 }
 
@@ -236,22 +234,21 @@ class Furniture extends Product {
 
   async updateProduct(productId) {
     // remove attr has null or undefined
-    const objectParams = removeUndefineObject(this);
+    const objectParams = this;
     // check for relate update attr
     if (objectParams?.product_attributes) {
       // update child
       await updateProductById({
         productId,
-        payload: removeUndefineObject(objectParams.product_attributes),
+        payload: removeUndefinedNull(objectParams.product_attributes),
         model: furniture,
       });
     }
 
-    const updateProduct = await super.updateProduct(
+    return await super.updateProduct(
       productId,
-      removeNestedObjectParser(objectParams)
+      removeUndefinedNull(objectParams)
     );
-    return updateProduct;
   }
 }
 

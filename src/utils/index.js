@@ -14,27 +14,20 @@ const getUnSelectData = (select = []) => {
   return Object.fromEntries(select.map((el) => [el, 0]));
 };
 
-const removeUndefineObject = (obj) => {
-  Object.keys(obj).forEach((k) => {
-    if (obj[k] === undefined || obj[k] === null) {
-      delete obj[k];
-    }
-  });
-  return obj;
-};
-
-const removeNestedObjectParser = (obj) => {
-  Object.keys(obj).forEach((k) => {
-    if (typeof obj[k] === "object" && !Array.isArray(obj[k])) {
-      const res = removeUndefineObject(obj[k]);
-      Object.keys(res).forEach((a) => {
-        obj[`${k}.${a}`] = res[a];
+function removeUndefinedNull(obj) {
+  for (const key in obj) {
+    if (obj[key] && typeof obj[key] === "object") {
+      obj[key] = removeUndefinedNull(obj[key]); // Recursively check nested objects
+      Object.keys(obj[key]).forEach((a) => {
+        obj[`${key}.${a}`] = obj[key][a];
       });
-      delete obj[k];
+      delete obj[key];
+    } else if (obj[key] === undefined || obj[key] === null) {
+      delete obj[key]; // Delete keys with undefined or null values
     }
-  });
+  }
   return obj;
-};
+}
 
 const isEmptyObject = (obj) => {
   return Object.entries(obj).length === 0 && obj.constructor === Object;
@@ -45,6 +38,5 @@ module.exports = {
   getInfoData,
   getSelectData,
   getUnSelectData,
-  removeUndefineObject,
-  removeNestedObjectParser,
+  removeUndefinedNull,
 };
