@@ -20,6 +20,7 @@ const {
 } = require("../models/repositories/product.repo");
 const { removeUndefinedNull } = require("../utils");
 const { mongoose } = require("mongoose");
+const { insertInventory } = require("../models/repositories/inventory.repo");
 
 // define Factory class to create product
 class ProductFactory {
@@ -124,10 +125,20 @@ class Product {
 
   //   create product
   async createProduct(product_id) {
-    return await product.create({
+    const newProduct = await product.create({
       ...this,
       _id: product_id,
     });
+
+    if (!newProduct) throw new BadRequestError("Create new Product Error");
+
+    await insertInventory({
+      productId: newProduct._id,
+      shop: this.product_shop,
+      stock: this.product_quantity,
+    });
+
+    return newProduct;
   }
 
   // Update Product
