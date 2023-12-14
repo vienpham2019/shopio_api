@@ -31,6 +31,4 @@ const discountSchema = new Schema(
 );
 
 //Export the model
-module.exports = {
-  discount: model(DOCUMENT_NAME, discountSchema),
-};
+module.exports = model(DOCUMENT_NAME, discountSchema);

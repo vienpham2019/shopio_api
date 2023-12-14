@@ -1,11 +1,11 @@
 "use strict";
 
 const { getUnSelectData, getSelectData } = require("../../utils");
-const { discount } = require("../discount.model");
+const discountModel = require("../discount/discount.model");
 
 // Find
 const findDiscount = async (query) => {
-  return await discount.findOne(query).lean();
+  return await discountModel.findOne(query).lean();
 };
 
 const findAllDiscountCodesUnSelect = async ({
@@ -17,7 +17,7 @@ const findAllDiscountCodesUnSelect = async ({
 }) => {
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
-  return await discount
+  return await discountModel
     .find(filter)
     .sort(sortBy)
     .skip(skip)
@@ -34,7 +34,7 @@ const findAllDiscountCodesSelect = async ({
 }) => {
   const skip = (page - 1) * limit;
   const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
-  return await discount
+  return await discountModel
     .find(filter)
     .sort(sortBy)
     .skip(skip)
@@ -55,12 +55,12 @@ const createDiscount = async (payload) => {
   payload.discount_product_ids =
     discount_applies_to === "all" ? [] : discount_product_ids;
 
-  return await discount.create(payload);
+  return await discountModel.create(payload);
 };
 
 // Update
 const updateDiscountUsersUsed = async ({ discountId, userId }) => {
-  return await discount.findByIdAndUpdate(discountId, {
+  return await discountModel.findByIdAndUpdate(discountId, {
     $pull: {
       discount_users_used: userId,
     },

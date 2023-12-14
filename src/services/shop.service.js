@@ -1,6 +1,6 @@
 "use strict";
 
-const userModel = require("../models/user.model");
+const userModel = require("../models/user/user.model");
 
 const findByEmail = async ({
   email,

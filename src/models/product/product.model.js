@@ -74,52 +74,5 @@ productSchema.pre("save", function (next) {
   next();
 });
 
-// define the product type = clothing
-const clothingSchema = new Schema(
-  {
-    brand: { type: String, required: true },
-    size: { type: String, required: true },
-    material: { type: String, required: true },
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  {
-    timestamps: true,
-    collection: "Clothing",
-  }
-);
-
-// define the product type = electronic
-const electronicSchema = new Schema(
-  {
-    manufacturer: { type: String, required: true },
-    model: String,
-    color: String,
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  {
-    timestamps: true,
-    collection: "Electronic",
-  }
-);
-
-// define the product type = furniture
-const furnitureSchema = new Schema(
-  {
-    brand: { type: String, required: true },
-    size: { type: String, required: true },
-    material: { type: String, required: true },
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
-  },
-  {
-    timestamps: true,
-    collection: "Furniture",
-  }
-);
-
 //Export the model
-module.exports = {
-  product: model(DOCUMENT_NAME, productSchema),
-  electronic: model("Electronics", electronicSchema),
-  clothing: model("Clothings", clothingSchema),
-  furniture: model("Furnitures", furnitureSchema),
-};
+module.exports = model(DOCUMENT_NAME, productSchema);

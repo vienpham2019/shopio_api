@@ -34,4 +34,4 @@ const inventorySchema = new Schema(
 );
 
 //Export the model
-module.exports = { inventory: model(DOCUMENT_NAME, inventorySchema) };
+module.exports = model(DOCUMENT_NAME, inventorySchema);
