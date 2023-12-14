@@ -19,18 +19,18 @@ const {
 
 router.get("/search/:keySearch", asyncHandler(searchProductByUser));
 router.get("", asyncHandler(getAllProducts));
-router.get("/:product_id", asyncHandler(getProduct));
+router.get("/:productId", asyncHandler(getProduct));
 
 // Authentication
 router.use(authentication);
 
 // update product
-router.patch("/:product_id", asyncHandler(updateProduct));
+router.patch("/:productId", asyncHandler(updateProduct));
 
 // create product
 router.post("", asyncHandler(createNewProduct));
-router.post("/publish/:id", asyncHandler(publishProductByShop));
-router.post("/unpublish/:id", asyncHandler(unPublishProductByShop));
+router.post("/publish/:productId", asyncHandler(publishProductByShop));
+router.post("/unpublish/:productId", asyncHandler(unPublishProductByShop));
 
 // query
 router.get("/drafts/all", asyncHandler(getAllDraftsForShop));

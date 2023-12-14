@@ -32,17 +32,17 @@ class Product {
   }
 
   //   create product
-  async createProduct(product_id) {
+  async createProduct(productd) {
     const newProduct = await productModel.create({
       ...this,
-      _id: product_id,
+      _id: productd,
     });
 
     if (!newProduct) throw new BadRequestError("Create new Product Error");
 
     await insertInventory({
       productId: newProduct._id,
-      shop: this.product_shop,
+      shopId: this.product_shop,
       stock: this.product_quantity,
     });
 
@@ -50,9 +50,10 @@ class Product {
   }
 
   // Update Product
-  async updateProduct(productId, payload) {
+  async updateProduct({ productId, shopId, payload }) {
     return await updateProductById({
       productId,
+      shopId,
       payload,
       model: productModel,
       unSelect: [],

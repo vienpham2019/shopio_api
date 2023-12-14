@@ -24,21 +24,23 @@ class Furniture extends Product {
     return await super.createProduct(productId);
   }
 
-  async updateProduct(productId) {
+  async updateProduct({ productId, shopId }) {
     const objectParams = this;
 
     if (objectParams.product_attributes) {
       objectParams.product_attributes = await updateProductById({
         productId,
+        shopId,
         payload: removeUndefinedNull(objectParams.product_attributes),
         model: furnitureModel,
       });
     }
 
-    return await super.updateProduct(
+    return await super.updateProduct({
       productId,
-      removeUndefinedNull(objectParams)
-    );
+      shopId,
+      payload: removeUndefinedNull(objectParams),
+    });
   }
 }
 

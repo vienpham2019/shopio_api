@@ -9,6 +9,8 @@ const inventorySchema = new Schema(
     inven_productId: {
       type: Schema.Types.ObjectId,
       ref: "Product",
+      required: true,
+      immutable: true,
     },
     inven_location: {
       type: String,
@@ -20,7 +22,9 @@ const inventorySchema = new Schema(
     },
     inven_shopId: {
       type: Schema.Types.ObjectId,
-      ref: "Shop",
+      ref: "User",
+      required: true,
+      immutable: true,
     },
     inven_reservations: {
       type: Array,

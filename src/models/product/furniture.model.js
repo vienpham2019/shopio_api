@@ -9,7 +9,12 @@ const furnitureSchema = new Schema(
     brand: { type: String, required: true },
     size: { type: String, required: true },
     material: { type: String, required: true },
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      immutable: true,
+    },
   },
   {
     timestamps: true,

@@ -31,7 +31,12 @@ const productSchema = new Schema(
       required: true,
       enum: ["Electronic", "Clothing", "Furniture"],
     },
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      immutable: true,
+    },
     product_attributes: {
       type: Schema.Types.Mixed,
       required: true,

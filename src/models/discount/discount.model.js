@@ -18,7 +18,12 @@ const discountSchema = new Schema(
     discount_users_used: { type: Array, default: [] }, //users
     discount_max_uses_per_user: { type: Number, required: true, min: 1 }, // number of time for user can use discount
     discount_min_order_value: { type: Number, required: true }, // minimun order total for discount
-    discount_shopId: { type: Schema.Types.ObjectId, ref: "User" },
+    discount_shopId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      immutable: true,
+    },
 
     discount_is_active: { type: Boolean, default: true },
     discount_applies_to: { type: String, enum: ["all", "specific"] },

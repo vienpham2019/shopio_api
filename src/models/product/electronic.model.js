@@ -9,7 +9,12 @@ const electronicSchema = new Schema(
     manufacturer: { type: String, required: true },
     model: String,
     color: String,
-    product_shop: { type: Schema.Types.ObjectId, ref: "User" },
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      immutable: true,
+    },
   },
   {
     timestamps: true,

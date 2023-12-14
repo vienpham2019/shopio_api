@@ -20,7 +20,7 @@ class ProductFactory {
     ProductFactory.productRegistry[type] = classRef;
   }
 
-  static async createProduct(type, payload) {
+  static async createProduct({ type, payload }) {
     const productClass = ProductFactory.productRegistry[type];
     if (!productClass) {
       throw new BadRequestError(`Invalid Product Type ${type}`);
@@ -29,37 +29,38 @@ class ProductFactory {
   }
 
   // PATCH //
-  static async updateProduct(type, product_id, payload) {
-    if (!mongoose.isValidObjectId(product_id)) {
+  static async updateProduct({ type, productId, shopId, payload }) {
+    if (!mongoose.isValidObjectId(productId)) {
       throw new BadRequestError("Invalid product Id");
     }
     const productClass = ProductFactory.productRegistry[type];
     if (!productClass) {
       throw new BadRequestError(`Invalid Product Type ${type}`);
     }
-    return new productClass(payload).updateProduct(product_id);
+    return new productClass(payload).updateProduct({
+      productId,
+      shopId,
+    });
   }
   // END PATCH //
 
   // PUT //
-  static async publishProductByShop({ product_shop, product_id }) {
-    return await publishProductByShop({ product_shop, product_id });
+  static async publishProductByShop({ productId, shopId }) {
+    return await publishProductByShop({ productId, shopId });
   }
-  static async unPublishProductByShop({ product_shop, product_id }) {
-    return await unPublishProductByShop({ product_shop, product_id });
+  static async unPublishProductByShop({ productId, shopId }) {
+    return await unPublishProductByShop({ productId, shopId });
   }
 
   // End PUT //
 
   // QUERY //
-  static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }) {
-    const query = { product_shop, isDraft: true };
-    return await findAllDraftsForShop({ query, limit, skip });
+  static async findAllDraftsForShop({ shopId, limit = 50, skip = 0 }) {
+    return await findAllDraftsForShop({ shopId, limit, skip });
   }
 
-  static async findAllPublishsForShop({ product_shop, limit = 50, skip = 0 }) {
-    const query = { product_shop, isPublish: true };
-    return await findAllPublishsForShop({ query, limit, skip });
+  static async findAllPublishsForShop({ shopId, limit = 50, skip = 0 }) {
+    return await findAllPublishsForShop({ shopId, limit, skip });
   }
 
   static async searchProductByUser({ keySearch }) {
@@ -70,7 +71,7 @@ class ProductFactory {
     limit = 50,
     sort = "ctime",
     page = 1,
-    filter = { isPublished: true },
+    filter = {},
   }) {
     return await findAllProducts({
       limit,
@@ -81,11 +82,11 @@ class ProductFactory {
     });
   }
 
-  static async findProduct({ product_id }) {
-    if (!mongoose.isValidObjectId(product_id)) {
+  static async findProduct({ productId }) {
+    if (!mongoose.isValidObjectId(productId)) {
       throw new BadRequestError("Invalid product Id");
     }
-    return await findProduct({ product_id, unSelect: ["__v"] });
+    return await findProduct({ productId, unSelect: ["__v"] });
   }
 
   // END QUERY //
