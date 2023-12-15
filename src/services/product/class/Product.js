@@ -3,12 +3,12 @@
 const { BadRequestError } = require("../../../core/error.response");
 const productModel = require("../../../models/product/product.model");
 const {
-  insertInventory,
+  createInventory,
+  deleteInventory,
 } = require("../../../models/repositories/inventory.repo");
 
 const {
   updateProductById,
-  deleteDraftProduct,
   createProductAttributes,
 } = require("../../../models/repositories/product.repo");
 const { removeUndefinedNull } = require("../../../utils");
@@ -34,7 +34,7 @@ class Product {
 
     if (!newProduct) throw new BadRequestError("Create new Product Error");
 
-    await insertInventory({
+    await createInventory({
       productId: newProduct._id,
       shopId: newProduct.product_shopId,
       stock: newProduct.product_quantity,
@@ -69,6 +69,10 @@ class Product {
       model: productModel,
       unSelect: [],
     });
+  }
+
+  static async deleteDraftProduct({ productId, shopId }) {
+    await deleteInventory({ productId, shopId });
   }
 }
 

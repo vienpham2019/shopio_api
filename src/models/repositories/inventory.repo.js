@@ -1,7 +1,8 @@
 "use strict";
 const inventoryModel = require("../inventory/inventory.model");
 
-const insertInventory = async ({
+// Create
+const createInventory = async ({
   productId,
   shopId,
   stock,
@@ -15,6 +16,13 @@ const insertInventory = async ({
   });
 };
 
+// Delete
+const deleteInventory = async ({ productId, shopId }) => {
+  const filter = { inven_productId: productId, inven_shopId: shopId };
+  return inventoryModel.deleteOne(filter);
+};
+
 module.exports = {
-  insertInventory,
+  createInventory,
+  deleteInventory,
 };

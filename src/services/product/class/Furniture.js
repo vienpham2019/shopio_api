@@ -28,6 +28,7 @@ class Furniture extends Product {
   }
 
   static async deleteDraftProduct({ productId, shopId }) {
+    await super.deleteDraftProduct({ productId, shopId });
     return await deleteDraftProduct({
       productId,
       shopId,
