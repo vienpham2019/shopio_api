@@ -11,7 +11,7 @@ class ProductController {
         type: req.body.product_type,
         payload: {
           ...req.body,
-          product_shop: req.user.userId,
+          product_shopId: req.user.userId,
         },
       }),
     }).send(res);
@@ -21,7 +21,6 @@ class ProductController {
     new SuccessResponse({
       message: "Update Product success!",
       metadata: await ProductService.updateProduct({
-        type: req.body.product_type,
         productId: req.params.productId,
         shopId: req.user.userId,
         payload: req.body,
@@ -55,6 +54,7 @@ class ProductController {
       message: "Get all drafts Product success!",
       metadata: await ProductService.findAllDraftsForShop({
         shopId: req.user.userId,
+        ...req.query,
       }),
     }).send(res);
   };
@@ -64,14 +64,15 @@ class ProductController {
       message: "Get all publish Product success!",
       metadata: await ProductService.findAllPublishsForShop({
         shopId: req.user.userId,
+        ...req.query,
       }),
     }).send(res);
   };
 
   searchProductByUser = async (req, res, next) => {
     new SuccessResponse({
-      message: "SearchProduct success!",
-      metadata: await ProductService.searchProductByUser(req.params),
+      message: "Search product success!",
+      metadata: await ProductService.searchProductByUser(req.query),
     }).send(res);
   };
 
@@ -91,6 +92,17 @@ class ProductController {
     }).send(res);
   };
   // END QUERY //
+
+  // Delete
+  deleteDraftProduct = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Delete product success!",
+      metadata: await ProductService.deleteDraftProduct({
+        productId: req.params.productId,
+        shopId: req.user.userId,
+      }),
+    }).send(res);
+  };
 }
 
 module.exports = new ProductController();

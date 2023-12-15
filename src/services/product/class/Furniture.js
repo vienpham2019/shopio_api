@@ -10,36 +10,28 @@ const { removeUndefinedNull } = require("../../../utils");
 const Product = require("./product");
 
 class Furniture extends Product {
-  async createProduct() {
-    const { attributes, productId } = await createProductAttributes({
-      payload: {
-        ...this.product_attributes,
-        product_shop: this.product_shop,
-      },
-      model: furnitureModel,
+  static async createProduct(payload) {
+    return await super.createProduct({
+      payload,
+      attributesModel: furnitureModel,
     });
-
-    this.product_attributes = attributes;
-
-    return await super.createProduct(productId);
   }
 
-  async updateProduct({ productId, shopId }) {
-    const objectParams = this;
-
-    if (objectParams.product_attributes) {
-      objectParams.product_attributes = await updateProductById({
-        productId,
-        shopId,
-        payload: removeUndefinedNull(objectParams.product_attributes),
-        model: furnitureModel,
-      });
-    }
-
+  static async updateProduct({ productId, shopId, unSelect, payload }) {
     return await super.updateProduct({
       productId,
       shopId,
-      payload: removeUndefinedNull(objectParams),
+      payload,
+      unSelect,
+      attributesModel: furnitureModel,
+    });
+  }
+
+  static async deleteDraftProduct({ productId, shopId }) {
+    return await deleteDraftProduct({
+      productId,
+      shopId,
+      attributesModel: furnitureModel,
     });
   }
 }

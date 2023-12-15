@@ -18,6 +18,14 @@ const getUnSelectData = (select = []) => {
   return Object.fromEntries(select.map((el) => [el, 0]));
 };
 
+const getSkip = ({ limit, page }) => {
+  return (page - 1) * limit;
+};
+
+const getSortBy = (sortType) => {
+  return sortType === "ctime" ? { _id: -1 } : { _id: 1 };
+};
+
 function removeUndefinedNull(obj) {
   for (const key in obj) {
     if (obj[key] && typeof obj[key] === "object") {
@@ -41,6 +49,8 @@ module.exports = {
   isEmptyObject,
   getInfoData,
   getSelectData,
+  getSkip,
+  getSortBy,
   getUnSelectData,
   removeUndefinedNull,
   convertToObjectIdMongoDB,

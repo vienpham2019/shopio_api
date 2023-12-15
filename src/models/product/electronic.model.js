@@ -9,7 +9,7 @@ const electronicSchema = new Schema(
     manufacturer: { type: String, required: true },
     model: String,
     color: String,
-    product_shop: {
+    product_shopId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,

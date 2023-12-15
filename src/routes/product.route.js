@@ -15,25 +15,29 @@ const {
   unPublishProductByShop,
   getAllDraftsForShop,
   getAllPublishsForShop,
+  deleteDraftProduct,
 } = require("../controllers/product.controller");
 
-router.get("/search/:keySearch", asyncHandler(searchProductByUser));
+router.get("/search", asyncHandler(searchProductByUser));
 router.get("", asyncHandler(getAllProducts));
 router.get("/:productId", asyncHandler(getProduct));
 
 // Authentication
 router.use(authentication);
 
-// update product
-router.patch("/:productId", asyncHandler(updateProduct));
+// get
+router.get("/drafts/all", asyncHandler(getAllDraftsForShop));
+router.get("/published/all", asyncHandler(getAllPublishsForShop));
 
-// create product
+// create
 router.post("", asyncHandler(createNewProduct));
 router.post("/publish/:productId", asyncHandler(publishProductByShop));
 router.post("/unpublish/:productId", asyncHandler(unPublishProductByShop));
 
-// query
-router.get("/drafts/all", asyncHandler(getAllDraftsForShop));
-router.get("/published/all", asyncHandler(getAllPublishsForShop));
+// update
+router.patch("/:productId", asyncHandler(updateProduct));
+
+// delete
+router.delete("/drafts/:productId", asyncHandler(deleteDraftProduct));
 
 module.exports = router;

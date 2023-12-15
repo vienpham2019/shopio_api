@@ -8,53 +8,64 @@ const {
 
 const {
   updateProductById,
+  deleteDraftProduct,
+  createProductAttributes,
 } = require("../../../models/repositories/product.repo");
+const { removeUndefinedNull } = require("../../../utils");
 
 class Product {
-  constructor({
-    product_name,
-    product_thumbnail,
-    product_description,
-    product_price,
-    product_quantity,
-    product_type,
-    product_shop,
-    product_attributes,
-  }) {
-    this.product_name = product_name;
-    this.product_thumbnail = product_thumbnail;
-    this.product_description = product_description;
-    this.product_type = product_type;
-    this.product_price = product_price;
-    this.product_quantity = product_quantity;
-    this.product_shop = product_shop;
-    this.product_attributes = product_attributes;
-  }
-
   //   create product
-  async createProduct(productd) {
+  static async createProduct({ payload, attributesModel }) {
+    const attributes_payload = removeUndefinedNull(payload.product_attributes);
+    const { attributes, productId } = await createProductAttributes({
+      payload: {
+        ...attributes_payload,
+        product_shopId: payload.product_shopId,
+      },
+      model: attributesModel,
+    });
+
+    payload.product_attributes = attributes;
+
     const newProduct = await productModel.create({
-      ...this,
-      _id: productd,
+      ...payload,
+      _id: productId,
     });
 
     if (!newProduct) throw new BadRequestError("Create new Product Error");
 
     await insertInventory({
       productId: newProduct._id,
-      shopId: this.product_shop,
-      stock: this.product_quantity,
+      shopId: newProduct.product_shopId,
+      stock: newProduct.product_quantity,
     });
 
     return newProduct;
   }
 
   // Update Product
-  async updateProduct({ productId, shopId, payload }) {
+  static async updateProduct({
+    productId,
+    shopId,
+    payload,
+    unSelect,
+    attributesModel,
+  }) {
+    const updateProd = payload;
+    if (updateProd.product_attributes) {
+      updateProd.product_attributes = await updateProductById({
+        productId,
+        shopId,
+        payload: removeUndefinedNull(updateProd.product_attributes),
+        model: attributesModel,
+        unSelect,
+      });
+    }
+
     return await updateProductById({
       productId,
       shopId,
-      payload,
+      payload: removeUndefinedNull(updateProd),
       model: productModel,
       unSelect: [],
     });

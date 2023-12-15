@@ -7,9 +7,9 @@ const COLLECTION_NAME = "Furnitures";
 const furnitureSchema = new Schema(
   {
     brand: { type: String, required: true },
-    size: { type: String, required: true },
-    material: { type: String, required: true },
-    product_shop: {
+    size: String,
+    material: String,
+    product_shopId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
