@@ -25,6 +25,12 @@ const findAllProducts = async ({ limit, sort, page, filter, select }) => {
   return products;
 };
 
+const findProductByShopId = async ({ shopId, productId }) => {
+  return await productModel
+    .findOne({ _id: productId, product_shopId: shopId, isPublished: true })
+    .lean();
+};
+
 const findProduct = async ({ productId, unSelect }) => {
   return await productModel
     .findById(productId)
@@ -187,4 +193,5 @@ module.exports = {
   createProductAttributes,
   deleteDraftProduct,
   getProductType,
+  findProductByShopId,
 };

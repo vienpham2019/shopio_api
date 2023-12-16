@@ -5,6 +5,7 @@ const { asyncHandler } = require("../helpers/asyncHandler");
 const { authentication } = require("../auth/authUtil");
 const {
   getAllDiscountCodeByShop,
+  getAllDiscountCodeByUser,
   getAllDiscountCodesWithProduct,
   getDiscountAmount,
   createDiscountCode,
@@ -14,17 +15,19 @@ const {
 } = require("../controllers/discount.controller");
 const router = express.Router();
 
-router.get("/:shopId", asyncHandler(getAllDiscountCodeByShop));
-router.get("/:productId", asyncHandler(getAllDiscountCodesWithProduct));
-router.get("/amount", asyncHandler(getDiscountAmount));
+router.get("/shop/:shopId", asyncHandler(getAllDiscountCodeByUser));
+router.get("/product", asyncHandler(getAllDiscountCodesWithProduct));
 
 // Authentication
 router.use(authentication);
+router.get("/shop", asyncHandler(getAllDiscountCodeByShop));
 
-router.patch("/:discountId", asyncHandler(updateDiscountCode));
+router.post("/shop", asyncHandler(createDiscountCode));
+
+router.patch("/amount", asyncHandler(getDiscountAmount));
+router.patch("/shop/:discountId", asyncHandler(updateDiscountCode));
 router.patch("/cancle", asyncHandler(cancleDiscountCode));
-router.post("", asyncHandler(createDiscountCode));
 
-router.delete("/:id", asyncHandler(deleteDiscountCode));
+router.delete("/shop", asyncHandler(deleteDiscountCode));
 
 module.exports = router;

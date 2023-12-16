@@ -10,7 +10,7 @@ class DiscountController {
       message: "Create discount code Success!",
       metadata: await DiscountService.createDiscountCode({
         ...req.body,
-        shopId: req.user.userId,
+        discount_shopId: req.user.userId,
       }),
     }).send(res);
   };
@@ -20,7 +20,8 @@ class DiscountController {
     new SuccessResponse({
       message: "Update discount code Success!",
       metadata: await DiscountService.updateDiscountCode({
-        ...req.body,
+        payload: req.body,
+        discountId: req.params.discountId,
         shopId: req.user.userId,
       }),
     }).send(res);
@@ -31,19 +32,30 @@ class DiscountController {
     new SuccessResponse({
       message: "Delete discount code Success!",
       metadata: await DiscountService.deleteDiscountCode({
-        code: req.params.cod,
+        code: req.query.code,
         shopId: req.user.userId,
       }),
     }).send(res);
   };
 
-  // [Shop | User]
+  // [Shop]
   getAllDiscountCodeByShop = async (req, res, next) => {
     new SuccessResponse({
       message: "Get discount code Success!",
       metadata: await DiscountService.getAllDiscountCodeByShop({
         ...req.query,
         shopId: req.user.userId,
+      }),
+    }).send(res);
+  };
+
+  // [ User]
+  getAllDiscountCodeByUser = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Get discount code Success!",
+      metadata: await DiscountService.getAllDiscountCodeByUser({
+        ...req.query,
+        shopId: req.params.shopId,
       }),
     }).send(res);
   };
@@ -60,7 +72,10 @@ class DiscountController {
   getDiscountAmount = async (req, res, next) => {
     new SuccessResponse({
       message: "Get discount amount Success!",
-      metadata: await DiscountService.getDiscountAmount(req.body),
+      metadata: await DiscountService.getDiscountAmount({
+        ...req.body,
+        userId: req.user.userId,
+      }),
     }).send(res);
   };
 
@@ -68,7 +83,10 @@ class DiscountController {
   cancleDiscountCode = async (req, res, next) => {
     new SuccessResponse({
       message: "Cancle discount codes Success!",
-      metadata: await DiscountService.cancleDiscountCode(req.query),
+      metadata: await DiscountService.cancleDiscountCode({
+        ...req.body,
+        userId: req.user.userId,
+      }),
     }).send(res);
   };
 }

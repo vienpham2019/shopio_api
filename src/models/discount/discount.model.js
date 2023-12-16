@@ -8,9 +8,24 @@ const discountSchema = new Schema(
   {
     discount_name: { type: String, required: true },
     discount_description: { type: String, required: true },
-    discount_type: { type: String, default: "fixed_amount" }, // fixed_amount or percentage
+    discount_type: {
+      type: String,
+      default: "fixed_amount",
+      enum: ["fixed_amount", "percentage"],
+    }, // fixed_amount or percentage
     discount_value: { type: Number, required: true },
-    discount_code: { type: String, required: true },
+    discount_code: {
+      type: String,
+      required: true,
+      trim: true,
+      validate: {
+        validator: function (v) {
+          // Custom validator to check for empty spaces
+          return !/\s/.test(v); // Returns true if there are no spaces
+        },
+        message: (props) => `${props.value} contains empty spaces!`,
+      },
+    },
     discount_start_date: { type: Date, required: true },
     discount_end_date: { type: Date, required: true },
     discount_max_uses: { type: Number, required: true, min: 1, default: 1 }, // max number of discount can use

@@ -1,43 +1,46 @@
 "use strict";
 
-const { getUnSelectData, getSelectData } = require("../../utils");
+const { ForbiddenError } = require("../../core/error.response");
+const {
+  getUnSelectData,
+  getSelectData,
+  getSortBy,
+  getSkip,
+} = require("../../utils");
 const discountModel = require("../discount/discount.model");
 
-// Find
+// Get
 const findDiscount = async (query) => {
   return await discountModel.findOne(query).lean();
 };
 
 const findAllDiscountCodesUnSelect = async ({
-  limit = 50,
-  page = 1,
-  sort = "ctime",
+  limit,
+  page,
+  sort,
   filter,
   unSelect,
 }) => {
-  const skip = (page - 1) * limit;
-  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   return await discountModel
     .find(filter)
-    .sort(sortBy)
-    .skip(skip)
+    .sort(getSortBy(sort))
+    .skip(getSkip({ page, limit }))
     .limit(limit)
     .select(getUnSelectData(unSelect))
     .lean();
 };
+
 const findAllDiscountCodesSelect = async ({
-  limit = 50,
-  page = 1,
-  sort = "ctime",
+  limit,
+  page,
+  sort,
   filter,
   select,
 }) => {
-  const skip = (page - 1) * limit;
-  const sortBy = sort === "ctime" ? { _id: -1 } : { _id: 1 };
   return await discountModel
     .find(filter)
-    .sort(sortBy)
-    .skip(skip)
+    .sort(getSortBy(sort))
+    .skip(getSkip({ page, limit }))
     .limit(limit)
     .select(getSelectData(select))
     .lean();
@@ -59,24 +62,65 @@ const createDiscount = async (payload) => {
 };
 
 // Update
-const updateDiscountUsersUsed = async ({ discountId, userId }) => {
+
+const updateDiscount = async ({
+  discountId,
+  shopId,
+  payload,
+  isNew = true,
+}) => {
+  const filter = { _id: discountId, discount_shopId: shopId };
+  const options = { new: isNew, runValidators: true };
+
+  const updateDiscountResult = await discountModel
+    .updateOne(filter, payload, options)
+    .lean();
+  if (updateDiscountResult.modifiedCount === 0) {
+    throw new ForbiddenError(`Discount can't update`);
+  }
+
+  return updateDiscountResult;
+};
+
+const cancleDiscountUsersUsed = async ({ discountId, userId }) => {
   return await discountModel.findByIdAndUpdate(discountId, {
     $pull: {
       discount_users_used: userId,
     },
     $inc: {
-      discount_max_uses: 1,
-      discount_uses_count: -1,
+      discount_used_count: -1,
+    },
+  });
+};
+
+const addDiscountUsersUsed = async ({ discountId, userId }) => {
+  return await discountModel.findByIdAndUpdate(discountId, {
+    $push: {
+      discount_users_used: userId,
+    },
+    $inc: {
+      discount_used_count: 1,
     },
   });
 };
 
 // Delete
+const deleteDiscountCode = async ({ shopId, code }) => {
+  const filter = { discount_code: code, discount_shopId: shopId };
+  const deleteDiscount = await discountModel.deleteOne(filter);
+  if (deleteDiscount.deletedCount === 0) {
+    throw new ForbiddenError(`Discount not found or can't deleted`);
+  }
+  return deleteDiscount;
+};
 
 module.exports = {
   findDiscount,
   findAllDiscountCodesUnSelect,
   findAllDiscountCodesSelect,
   createDiscount,
-  updateDiscountUsersUsed,
+  cancleDiscountUsersUsed,
+  addDiscountUsersUsed,
+  updateDiscount,
+  deleteDiscountCode,
 };
