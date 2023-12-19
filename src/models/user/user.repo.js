@@ -19,7 +19,7 @@ const createNewUser = async ({ payload }) => {
   return await userModel.create(payload);
 };
 // Update
-const updateUserToShop = async ({ userId }) => {
+const updateUserToShop = async ({ userId, select = [] }) => {
   const query = {
     _id: userId,
   };
@@ -28,8 +28,11 @@ const updateUserToShop = async ({ userId }) => {
       user_roles: UserRoleEnum.SHOP,
     },
   };
-  const options = { new: true };
-  return await userModel.findOneAndUpdate(query, update, options).lean();
+  const options = {};
+  return await userModel
+    .findOneAndUpdate(query, update, options)
+    .select(getSelectData(select))
+    .lean();
 };
 // Delete
 

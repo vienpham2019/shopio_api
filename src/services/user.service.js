@@ -1,11 +1,13 @@
 "use strict";
 const byscrypt = require("bcrypt");
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, ForbiddenError } = require("../core/error.response");
 const {
   getUserByEmail,
   createNewUser,
   updateUserToShop,
+  getUserById,
 } = require("../models/user/user.repo");
+const { UserRoleEnum } = require("../models/user/user.enum");
 
 class UserService {
   // Get
@@ -33,7 +35,20 @@ class UserService {
   }
   // Update
   static async setUserToShop({ userId }) {
-    return await updateUserToShop({ userId });
+    const foundUser = await getUserById({ userId });
+    if (!foundUser) {
+      throw new BadRequestError(`User not found`);
+    }
+    if (foundUser.user_roles.includes(UserRoleEnum.SHOP)) {
+      throw new BadRequestError(`User already shop`);
+    }
+    const updateUser = await updateUserToShop({ userId });
+    if (!updateUser) {
+      throw new ForbiddenError(`Update user error`);
+    }
+    return {
+      updateCount: 1,
+    };
   }
   // Delete
 }
