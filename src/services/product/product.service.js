@@ -12,6 +12,7 @@ const {
   findProduct,
   getProductType,
 } = require("../../models/repositories/product.repo");
+const { ProductTypeEnum } = require("../../models/product/product.enum");
 
 // define Factory class to create product
 class ProductFactory {
@@ -110,8 +111,17 @@ class ProductFactory {
 }
 
 // register product type
-ProductFactory.registerProductType("Electronic", require("./class/Electronic"));
-ProductFactory.registerProductType("Clothing", require("./class/Clothing"));
-ProductFactory.registerProductType("Furniture", require("./class/Furniture"));
+ProductFactory.registerProductType(
+  ProductTypeEnum.ELECTRONIC,
+  require("./class/Electronic")
+);
+ProductFactory.registerProductType(
+  ProductTypeEnum.CLOTHING,
+  require("./class/Clothing")
+);
+ProductFactory.registerProductType(
+  ProductTypeEnum.FURNITURE,
+  require("./class/Furniture")
+);
 
 module.exports = ProductFactory;

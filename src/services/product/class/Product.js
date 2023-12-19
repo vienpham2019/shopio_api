@@ -5,12 +5,13 @@ const productModel = require("../../../models/product/product.model");
 const {
   createInventory,
   deleteInventory,
-} = require("../../../models/repositories/inventory.repo");
+} = require("../../../models/inventory/inventory.repo");
 
 const {
   updateProductById,
   createProductAttributes,
-} = require("../../../models/repositories/product.repo");
+  deleteDraftProduct,
+} = require("../../../models/product/product.repo");
 const { removeUndefinedNull } = require("../../../utils");
 
 class Product {
@@ -71,8 +72,9 @@ class Product {
     });
   }
 
-  static async deleteDraftProduct({ productId, shopId }) {
+  static async deleteDraftProduct({ productId, shopId, attributesModel }) {
     await deleteInventory({ productId, shopId });
+    return await deleteDraftProduct({ productId, shopId, attributesModel });
   }
 }
 

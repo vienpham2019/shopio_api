@@ -7,9 +7,11 @@ const {
   getSortBy,
   getSkip,
 } = require("../../utils");
-const discountModel = require("../discount/discount.model");
+const { DiscountAppliesToEnum } = require("./discount.enum");
+const discountModel = require("./discount.model");
 
 // Get
+
 const findDiscount = async (query) => {
   return await discountModel.findOne(query).lean();
 };
@@ -56,7 +58,9 @@ const createDiscount = async (payload) => {
   } = payload;
   payload.discount_min_order_value = discount_min_order_value || 0;
   payload.discount_product_ids =
-    discount_applies_to === "all" ? [] : discount_product_ids;
+    discount_applies_to === DiscountAppliesToEnum.ALL
+      ? []
+      : discount_product_ids;
 
   return await discountModel.create(payload);
 };

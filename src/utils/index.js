@@ -52,6 +52,8 @@ const removeUndefinedNull = (obj) => {
   return obj;
 };
 
+const removeDuplicatesInArray = (array) => [...new Set(array)];
+
 const isEmptyObject = (obj) => {
   return Object.entries(obj).length === 0 && obj.constructor === Object;
 };
@@ -73,4 +75,5 @@ module.exports = {
   removeUndefinedNull,
   convertToObjectIdMongoDB,
   isInValidDate,
+  removeDuplicatesInArray,
 };

@@ -1,6 +1,8 @@
 "use strict";
 
 const { Schema, model } = require("mongoose"); // Erase if already required
+const { DiscountAppliesToEnum, DiscountTypeEnum } = require("./discount.enum");
+const productModel = require("../product/product.model");
 const DOCUMENT_NAME = "Discount";
 const COLLECTION_NAME = "Discounts";
 // Declare the Schema of the Mongo model
@@ -10,8 +12,8 @@ const discountSchema = new Schema(
     discount_description: { type: String, required: true },
     discount_type: {
       type: String,
-      default: "fixed_amount",
-      enum: ["fixed_amount", "percentage"],
+      default: DiscountTypeEnum.FIXED,
+      enum: Object.values(DiscountTypeEnum),
     }, // fixed_amount or percentage
     discount_value: { type: Number, required: true },
     discount_code: {
@@ -41,8 +43,20 @@ const discountSchema = new Schema(
     },
 
     discount_is_active: { type: Boolean, default: true },
-    discount_applies_to: { type: String, enum: ["all", "specific"] },
-    discount_product_ids: { type: Array, default: [] }, // products can apply for this discount
+    discount_applies_to: {
+      type: String,
+      enum: Object.values(DiscountAppliesToEnum),
+      required: true,
+    },
+    discount_product_ids: {
+      type: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+        },
+      ],
+      default: [],
+    }, // products can apply for this discount
   },
   {
     collection: COLLECTION_NAME,

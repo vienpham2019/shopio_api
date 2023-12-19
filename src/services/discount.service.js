@@ -6,6 +6,10 @@ const {
   ForbiddenError,
 } = require("../core/error.response");
 const {
+  DiscountAppliesToEnum,
+  DiscountTypeEnum,
+} = require("../models/discount/discount.enum");
+const {
   findDiscount,
   createDiscount,
   findAllDiscountCodesUnSelect,
@@ -14,16 +18,18 @@ const {
   addDiscountUsersUsed,
   updateDiscount,
   deleteDiscountCode,
-} = require("../models/repositories/discount.repo");
+} = require("../models/discount/discount.repo");
 const {
   findAllProducts,
   findProductByShopId,
-} = require("../models/repositories/product.repo");
+  checkForValidProductIds,
+} = require("../models/product/product.repo");
 
 const {
   convertToObjectIdMongoDB,
   removeUndefinedNull,
   isInValidDate,
+  removeDuplicatesInArray,
 } = require("../utils");
 
 /*
@@ -56,7 +62,7 @@ class DiscountService {
 
     const { discount_applies_to, discount_product_ids } = foundDiscount;
     let products;
-    if (discount_applies_to === "all") {
+    if (discount_applies_to === DiscountAppliesToEnum.ALL) {
       products = await findAllProducts({
         filter: {
           product_shop: convertToObjectIdMongoDB(shopId),
@@ -67,7 +73,7 @@ class DiscountService {
         sort,
         select: ["product_name"],
       });
-    } else if (discount_applies_to === "specific") {
+    } else if (discount_applies_to === DiscountAppliesToEnum.SPECIFIC) {
       products = await findAllProducts({
         filter: {
           _id: { $in: discount_product_ids },
@@ -150,12 +156,25 @@ class DiscountService {
       throw new BadRequestError("Discount exists!");
     }
 
+    if (payload.discount_applies_to == DiscountAppliesToEnum.SPECIFIC) {
+      payload.discount_product_ids = removeDuplicatesInArray(
+        payload.discount_product_ids
+      );
+      const invalidProductIds = await checkForValidProductIds(
+        payload?.discount_product_ids
+      );
+      if (invalidProductIds.length < payload.discount_product_ids.length) {
+        throw new BadRequestError(
+          "Some of the products are not published or do not exist!"
+        );
+      }
+    }
+
     return await createDiscount(payload);
   }
 
   // Update
   static async updateDiscountCode({ payload, discountId, shopId }) {
-    payload = removeUndefinedNull(payload);
     const foundDiscount = await findDiscount({
       _id: discountId,
       discount_shopId: shopId,
@@ -169,6 +188,20 @@ class DiscountService {
     if (new Date(foundDiscount.discount_end_date) < new Date()) {
       throw new BadRequestError("Discount has expired. Cannot update.");
     }
+    payload.discount_product_ids = removeDuplicatesInArray(
+      payload.discount_product_ids
+    );
+    if (payload.discount_product_ids) {
+      const invalidProductIds = await checkForValidProductIds(
+        payload?.discount_product_ids
+      );
+      if (invalidProductIds.length < payload.discount_product_ids.length) {
+        throw new BadRequestError(
+          "Some of the products are not published or do not exist!"
+        );
+      }
+    }
+    payload = removeUndefinedNull(payload);
 
     // Check for discount start then can't update discount code
     if (payload.discount_code) {
@@ -271,7 +304,7 @@ class DiscountService {
         productId: product._id,
       });
       if (foundProduct) {
-        if (discount_applies_to === "all") {
+        if (discount_applies_to === DiscountAppliesToEnum.ALL) {
           discountProductIds.push(foundProduct._id);
           subTotal += product.product_quantity * foundProduct.product_price;
         } else {
@@ -291,7 +324,7 @@ class DiscountService {
 
     // check discount fixed amount
     const discountAmount =
-      discount_type === "fixed_amount"
+      discount_type === DiscountTypeEnum.FIXED
         ? discount_value
         : subTotal * (discount_value / 100);
 

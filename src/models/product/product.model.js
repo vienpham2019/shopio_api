@@ -2,6 +2,7 @@
 
 const { Schema, model } = require("mongoose"); // Erase if already required
 const slugify = require("slugify");
+const { ProductTypeEnum } = require("./product.enum");
 const DOCUMENT_NAME = "Product";
 const COLLECTION_NAME = "Products";
 
@@ -29,7 +30,7 @@ const productSchema = new Schema(
     product_type: {
       type: String,
       required: true,
-      enum: ["Electronic", "Clothing", "Furniture"],
+      enum: Object.values(ProductTypeEnum),
       immutable: true,
     },
     product_shopId: {

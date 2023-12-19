@@ -1,5 +1,5 @@
 "use strict";
-const inventoryModel = require("../inventory/inventory.model");
+const inventoryModel = require("./inventory.model");
 
 // Create
 const createInventory = async ({

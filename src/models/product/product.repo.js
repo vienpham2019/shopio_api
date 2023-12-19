@@ -9,9 +9,16 @@ const {
   getSortBy,
 } = require("../../utils");
 const { BadRequestError } = require("../../core/error.response");
-const productModel = require("../product/product.model");
+const productModel = require("./product.model");
 
 // Get
+const checkForValidProductIds = async (productIds) => {
+  return await productModel.find({
+    _id: { $in: productIds },
+    isPublished: true,
+  });
+};
+
 const findAllProducts = async ({ limit, sort, page, filter, select }) => {
   filter.isPublished = true;
   const products = await productModel
@@ -194,4 +201,5 @@ module.exports = {
   deleteDraftProduct,
   getProductType,
   findProductByShopId,
+  checkForValidProductIds,
 };

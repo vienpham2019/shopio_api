@@ -1,10 +1,6 @@
 "use strict";
+
 const clothingModel = require("../../../models/product/clothing.model");
-const {
-  updateProductById,
-  createProductAttributes,
-} = require("../../../models/repositories/product.repo");
-const { removeUndefinedNull } = require("../../../utils");
 const Product = require("./product");
 
 class Clothing extends Product {
@@ -26,8 +22,7 @@ class Clothing extends Product {
   }
 
   static async deleteDraftProduct({ productId, shopId }) {
-    await super.deleteDraftProduct({ productId, shopId });
-    return await deleteDraftProduct({
+    return await super.deleteDraftProduct({
       productId,
       shopId,
       attributesModel: clothingModel,

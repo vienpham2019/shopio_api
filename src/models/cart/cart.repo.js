@@ -1,7 +1,8 @@
 "use strict";
 
 const { Types } = require("mongoose");
-const cartModel = require("../cart/cart.model");
+const cartModel = require("./cart.model");
+const { CartStateEnum } = require("./cart.enum");
 
 // Get
 const getCartByUserId = async ({ userId }) => {
@@ -12,7 +13,7 @@ const getCartByUserIdAndShopId = async ({ userId, shopId }) => {
   const query = {
     cart_userId: userId,
     "cart_orders.order_shopId": shopId,
-    cart_state: "active",
+    cart_state: CartStateEnum.ACTIVE,
   };
   return await cartModel.findOne(query).lean();
 };
@@ -21,7 +22,7 @@ const getCartByUserIdAndShopId = async ({ userId, shopId }) => {
 const addOrCreateCartWithOrder = async ({ userId, shopId }) => {
   const query = {
     cart_userId: userId,
-    cart_state: "active",
+    cart_state: CartStateEnum.ACTIVE,
   };
   const update = {
     $addToSet: {
@@ -41,7 +42,7 @@ const updateProductQuantity = async ({ userId, product }) => {
   const query = {
     cart_userId: userId,
     "cart_products.product_id": _id,
-    cart_state: "active",
+    cart_state: CartStateEnum.ACTIVE,
   };
   const updateSet = {
     $inc: {
@@ -57,7 +58,7 @@ const updateProductQuantityByOne = async ({ userId, product }) => {
     cart_userId: userId,
     "cart_orders.order_shopId": product.product_shopId,
     "cart_orders.order_products.product_id": product.product_id,
-    cart_state: "active",
+    cart_state: CartStateEnum.ACTIVE,
   };
   const update = {
     $inc: {
@@ -80,7 +81,7 @@ const addProductToOrderProducts = async ({ userId, product }) => {
     cart_userId: userId,
     "cart_orders.order_shopId": product.product_shopId,
     "cart_orders.order_products.product_id": product.product_id,
-    cart_state: "active",
+    cart_state: CartStateEnum.ACTIVE,
   });
 
   if (existingProduct) {
@@ -91,7 +92,7 @@ const addProductToOrderProducts = async ({ userId, product }) => {
   const query = {
     cart_userId: userId,
     "cart_orders.order_shopId": product.product_shopId,
-    cart_state: "active",
+    cart_state: CartStateEnum.ACTIVE,
   };
   const update = {
     $addToSet: {

@@ -1,6 +1,7 @@
 "use strict";
 
 const { Schema, model, Types } = require("mongoose"); // Erase if already required
+const { CartStateEnum } = require("./cart.enum");
 const DOCUMENT_NAME = "Cart";
 const COLLECTION_NAME = "Carts";
 
@@ -56,8 +57,8 @@ const cartSchema = new Schema(
     cart_state: {
       type: String,
       required: true,
-      enum: ["active", "completed", "failed", "pending"],
-      default: "active",
+      enum: Object.values(CartStateEnum),
+      default: CartStateEnum.ACTIVE,
     },
     cart_orders: { type: [cartOrdersSchema], required: true, default: [] },
     cart_count_product: { type: Number, default: 0 },
