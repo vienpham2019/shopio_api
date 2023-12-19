@@ -2,12 +2,13 @@
 
 const express = require("express");
 const { checkApiKey, checkPermission } = require("../auth/checkAuth");
+const { ApiKeyPermissionEnum } = require("../models/apikey/apiKey.enum");
 const router = express.Router();
 
 // check apiKey
 router.use(checkApiKey);
 // check permission
-router.use(checkPermission("0000"));
+router.use(checkPermission(ApiKeyPermissionEnum.REGULAR));
 
 router.use("/v1/api/cart", require("./cart.route"));
 router.use("/v1/api/discount", require("./discount.route"));

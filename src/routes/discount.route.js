@@ -13,6 +13,8 @@ const {
   cancleDiscountCode,
   deleteDiscountCode,
 } = require("../controllers/discount.controller");
+const { checkUserRole } = require("../auth/checkAuth");
+const { UserRoleEnum } = require("../models/user/user.enum");
 const router = express.Router();
 
 router.get("/shop/:shopId", asyncHandler(getAllDiscountCodeByUser));
@@ -20,14 +22,16 @@ router.get("/product", asyncHandler(getAllDiscountCodesWithProduct));
 
 // Authentication
 router.use(authentication);
+
 router.get("/shop", asyncHandler(getAllDiscountCodeByShop));
+router.patch("/cancle", asyncHandler(cancleDiscountCode));
+router.patch("/amount", asyncHandler(getDiscountAmount));
+
+// Check for valid role
+router.use(checkUserRole(UserRoleEnum.SHOP));
 
 router.post("/shop", asyncHandler(createDiscountCode));
-
-router.patch("/amount", asyncHandler(getDiscountAmount));
 router.patch("/shop/:discountId", asyncHandler(updateDiscountCode));
-router.patch("/cancle", asyncHandler(cancleDiscountCode));
-
 router.delete("/shop", asyncHandler(deleteDiscountCode));
 
 module.exports = router;

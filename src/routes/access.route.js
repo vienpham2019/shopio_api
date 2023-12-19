@@ -12,13 +12,13 @@ const {
   handlerRefreshToken,
 } = require("../controllers/access.controller");
 
-router.post("/shop/signup", asyncHandler(signUp));
-router.post("/shop/login", asyncHandler(logIn));
+router.post("/signup", asyncHandler(signUp));
+router.post("/login", asyncHandler(logIn));
 
 // authentication
 router.use(authentication);
 
-router.post("/shop/logout", asyncHandler(logOut));
-router.post("/shop/handlerRefreshToken", asyncHandler(handlerRefreshToken));
+router.post("/logout", asyncHandler(logOut));
+router.post("/handlerRefreshToken", asyncHandler(handlerRefreshToken));
 
 module.exports = router;

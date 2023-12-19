@@ -3,7 +3,7 @@
 const JWT = require("jsonwebtoken");
 const { asyncHandler } = require("../helpers/asyncHandler");
 const { AuthFailureError, NotFoundError } = require("../core/error.response");
-const { findByUserId } = require("../services/keyToken.service");
+const { findKeyTokenByUserId } = require("../models/keytoken/keyToken.repo");
 
 const HEADER = {
   API_KEY: "x-api-key",
@@ -37,7 +37,7 @@ const authentication = asyncHandler(async (req, res, next) => {
     throw new AuthFailureError("Invalid Request");
   }
   // get accesstoken
-  const keyStore = await findByUserId({ userId });
+  const keyStore = await findKeyTokenByUserId({ userId });
   if (!keyStore) {
     throw new NotFoundError("Not found keyStore");
   }

@@ -1,24 +1,22 @@
 "use strict";
-const userModel = require("../models/user/user.model");
 const byscrypt = require("bcrypt");
 const crypto = require("crypto");
-const KeyTokenService = require("./keyToken.service");
-const { createTokenPair, verifyJWT } = require("../auth/authUtil");
+// const KeyTokenService = require("./keyToken.service");
+const { createTokenPair } = require("../auth/authUtil");
 const { getInfoData } = require("../utils/index");
 const {
   BadRequestError,
   AuthFailureError,
   ForbiddenError,
 } = require("../core/error.response");
-const { findByEmail } = require("./shop.service");
-
-const RoleShop = {
-  SHOP: "00001",
-  WRITER: "00002",
-  EDITOR: "00003",
-  ADMIN: "00004",
-};
-
+const UserService = require("./user.service");
+const { getUserByEmail } = require("../models/user/user.repo");
+const {
+  deleteKeyTokenById,
+  updateRefreshToken,
+  removeKeyTokenById,
+  createKeyToken,
+} = require("../models/keytoken/keyToken.repo");
 class AccessService {
   /*
     - This function for create new refresh token and access token when access token is expiered
@@ -29,7 +27,7 @@ class AccessService {
   static handlerRefreshToken = async ({ keyStore, user, refreshToken }) => {
     const { userId, email } = user;
     if (keyStore.refreshTokensUsed.includes(refreshToken)) {
-      await KeyTokenService.deleteKeyById(userId);
+      await deleteKeyTokenById(userId);
       throw new ForbiddenError("Something wrong happed! Please re-login");
     }
 
@@ -37,7 +35,7 @@ class AccessService {
       throw new AuthFailureError("User not registered");
     }
 
-    const foundUser = await findByEmail({ email });
+    const foundUser = await getUserByEmail({ email });
     if (!foundUser) {
       throw new AuthFailureError("User not registered");
     }
@@ -53,7 +51,7 @@ class AccessService {
     );
 
     // update token
-    await KeyTokenService.updateRefreshToken({
+    await updateRefreshToken({
       token: keyStore,
       newRefreshToken: tokens.refreshToken,
     });
@@ -65,10 +63,7 @@ class AccessService {
   };
 
   static logOut = async (keyStore) => {
-    const deleteKeyStore = await KeyTokenService.removeKeyTokenById(
-      keyStore._id
-    );
-    return deleteKeyStore;
+    return await removeKeyTokenById(keyStore._id);
   };
   /*
       1 - Check email in bd 
@@ -79,13 +74,13 @@ class AccessService {
     */
   static logIn = async ({ email, password, refreshToken = null }) => {
     // Check email in DB
-    const foundUser = await findByEmail({ email });
+    const foundUser = await getUserByEmail({ email });
     if (!foundUser) {
       throw new BadRequestError("Shop not registered");
     }
 
     // Check password in DB
-    const matchPassword = byscrypt.compare(password, foundUser.password);
+    const matchPassword = byscrypt.compare(password, foundUser.user_password);
     if (!matchPassword) {
       throw new AuthFailureError("Authentication Error");
     }
@@ -101,7 +96,7 @@ class AccessService {
       privateKey
     );
 
-    await KeyTokenService.createKeyToken({
+    await createKeyToken({
       userId: foundUser._id,
       refreshToken: tokens.refreshToken,
       privateKey,
@@ -118,59 +113,13 @@ class AccessService {
   };
 
   static signUp = async ({ name, email, password }) => {
-    // check email unique
-    const existsEmail = await userModel.findOne({ email }).lean();
+    const newUser = await UserService.createUser({ name, email, password });
 
-    if (existsEmail) {
-      throw new BadRequestError("Error: Shop already registered!");
+    if (!newUser) {
+      throw new BadRequestError(`Can't registered`);
     }
 
-    const passwordHash = await byscrypt.hash(password, 10);
-
-    const newUser = await userModel.create({
-      name,
-      email,
-      password: passwordHash,
-      role: [RoleShop["SHOP"]],
-    });
-
-    if (newUser) {
-      // created privateKey and publicKey
-      const privateKey = crypto.randomBytes(64).toString("hex");
-      const publicKey = crypto.randomBytes(64).toString("hex");
-
-      const publicKeyString = await KeyTokenService.createKeyToken({
-        userId: newUser._id,
-        publicKey,
-        privateKey,
-      });
-
-      if (!publicKeyString) {
-        throw new BadRequestError("Error: Keys store error!");
-      }
-
-      // create token pair
-      const tokens = await createTokenPair(
-        {
-          userId: newUser._id,
-          email,
-        },
-        publicKey,
-        privateKey
-      );
-      return {
-        user: getInfoData({
-          fileds: ["_id", "name", "email"],
-          object: newUser,
-        }),
-        tokens,
-      };
-    }
-
-    return {
-      code: 200,
-      metadata: null,
-    };
+    return {};
   };
 }
 

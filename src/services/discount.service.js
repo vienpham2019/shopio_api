@@ -132,12 +132,7 @@ class DiscountService {
 
   // Create
   static async createDiscountCode(payload) {
-    const {
-      discount_start_date,
-      discount_end_date,
-      discount_code,
-      discount_shopId,
-    } = payload;
+    const { discount_start_date, discount_end_date, discount_code } = payload;
 
     payload.discount_start_date = new Date(discount_start_date);
     payload.discount_end_date = new Date(discount_end_date);

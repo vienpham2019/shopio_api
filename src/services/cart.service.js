@@ -1,12 +1,12 @@
 "use strict";
 
-const { BadRequestError } = require("../core/error.response");
+const { BadRequestError, NotFoundError } = require("../core/error.response");
 const {
-  getCartByUserId,
-  createCart,
-  addProductToCart,
-  updateProductQuantity,
+  addOrCreateCartWithOrder,
+  getCartByUserIdAndShopId,
+  addProductToOrderProducts,
 } = require("../models/repositories/cart.repo");
+const { findProduct } = require("../models/repositories/product.repo");
 
 /*
     - Add product to Cart [User]
@@ -20,27 +20,44 @@ const {
 class CartService {
   // Get
   // Create
-  // Update
   static async addToCart({ userId, product }) {
-    // Check for exists cart
-    const foundCart = await getCartByUserId({ userId });
-    if (!foundCart || foundCart?.cart_products.length === 0) {
-      return await addProductToCart({ userId, product });
+    // check for
+    const foundProduct = await findProduct({
+      productId: product._id,
+      unSelect: [],
+    });
+    if (!foundProduct) {
+      return new NotFoundError(`Product not found`);
     }
 
-    const existingProduct = foundCart.cart_products.find(
-      (cartProduct) =>
-        cartProduct.product_id.toString() === product._id.toString()
-    );
+    const { product_shopId, product_name, product_price, _id } = foundProduct;
 
-    console.log(existingProduct);
+    const addToCartProduct = {
+      product_id: _id,
+      product_shopId,
+      product_price,
+      product_name,
+    };
 
-    if (!existingProduct) {
-      return await addProductToCart({ userId, product });
+    // Check if the user has a cart with matching product_shopId
+    const existingCart = await getCartByUserIdAndShopId({
+      userId,
+      shopId: addToCartProduct.product_shopId,
+    });
+    if (!existingCart) {
+      await addOrCreateCartWithOrder({
+        userId,
+        shopId: addToCartProduct.product_shopId,
+      });
     }
 
-    return await updateProductQuantity({ userId, product });
+    // if cart exist then update product quantity
+    return await addProductToOrderProducts({
+      userId,
+      product: addToCartProduct,
+    });
   }
+  // Update
   // Delete
 }
 
