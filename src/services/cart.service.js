@@ -5,8 +5,9 @@ const {
   addOrCreateCartWithOrder,
   getCartByUserIdAndShopId,
   addProductToOrderProducts,
-} = require("../models/repositories/cart.repo");
-const { findProduct } = require("../models/repositories/product.repo");
+  deleteUserCart,
+} = require("../models/cart/cart.repo");
+const { findProduct } = require("../models/product/product.repo");
 
 /*
     - Add product to Cart [User]
@@ -27,7 +28,7 @@ class CartService {
       unSelect: [],
     });
     if (!foundProduct) {
-      return new NotFoundError(`Product not found`);
+      throw new NotFoundError(`Product not found`);
     }
 
     const { product_shopId, product_name, product_price, _id } = foundProduct;
@@ -59,6 +60,10 @@ class CartService {
   }
   // Update
   // Delete
+
+  static async deleteUserCart({ userId }) {
+    return await deleteUserCart({ userId });
+  }
 }
 
 module.exports = CartService;

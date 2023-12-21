@@ -19,7 +19,7 @@ const orderProductSchema = new Schema(
     product_quantity: {
       type: Number,
       required: true,
-      default: 0, // You can set a default quantity if needed
+      default: 1, // You can set a default quantity if needed
     },
     product_old_quantity: {
       type: Number,

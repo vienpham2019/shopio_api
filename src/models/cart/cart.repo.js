@@ -109,6 +109,15 @@ const addProductToOrderProducts = async ({ userId, product }) => {
 };
 
 // Delete
+const deleteUserCart = async ({ userId }) => {
+  try {
+    const query = { cart_userId: userId };
+
+    return await cartModel.deleteOne(query);
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   getCartByUserIdAndShopId,
@@ -117,4 +126,5 @@ module.exports = {
   updateProductQuantity,
   updateProductQuantityByOne,
   addProductToOrderProducts,
+  deleteUserCart,
 };

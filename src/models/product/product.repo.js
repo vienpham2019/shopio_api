@@ -12,9 +12,10 @@ const { BadRequestError } = require("../../core/error.response");
 const productModel = require("./product.model");
 
 // Get
-const checkForValidProductIds = async (productIds) => {
+const checkForValidProductIds = async ({ payload, shopId }) => {
   return await productModel.find({
-    _id: { $in: productIds },
+    _id: { $in: payload },
+    product_shopId: shopId,
     isPublished: true,
   });
 };

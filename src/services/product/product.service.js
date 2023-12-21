@@ -11,7 +11,7 @@ const {
   findAllProducts,
   findProduct,
   getProductType,
-} = require("../../models/repositories/product.repo");
+} = require("../../models/product/product.repo");
 const { ProductTypeEnum } = require("../../models/product/product.enum");
 
 // define Factory class to create product

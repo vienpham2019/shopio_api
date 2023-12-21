@@ -160,9 +160,10 @@ class DiscountService {
       payload.discount_product_ids = removeDuplicatesInArray(
         payload.discount_product_ids
       );
-      const invalidProductIds = await checkForValidProductIds(
-        payload?.discount_product_ids
-      );
+      const invalidProductIds = await checkForValidProductIds({
+        payload: payload.discount_product_ids,
+        shopId: payload.discount_shopId,
+      });
       if (invalidProductIds.length < payload.discount_product_ids.length) {
         throw new BadRequestError(
           "Some of the products are not published or do not exist!"
@@ -192,9 +193,10 @@ class DiscountService {
       payload.discount_product_ids
     );
     if (payload.discount_product_ids) {
-      const invalidProductIds = await checkForValidProductIds(
-        payload?.discount_product_ids
-      );
+      const invalidProductIds = await checkForValidProductIds({
+        payload: payload.discount_product_ids,
+        shopId: payload.discount_shopId,
+      });
       if (invalidProductIds.length < payload.discount_product_ids.length) {
         throw new BadRequestError(
           "Some of the products are not published or do not exist!"
