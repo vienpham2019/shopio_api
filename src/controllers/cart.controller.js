@@ -5,6 +5,14 @@ const CartService = require("../services/cart.service");
 
 class CartController {
   //  Get
+  getUserCart = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Get user cart Success!",
+      metadata: await CartService.getUserCart({
+        userId: req.user.userId,
+      }),
+    }).send(res);
+  };
   // Create
   addToCart = async (req, res, next) => {
     new SuccessResponse({
@@ -17,7 +25,15 @@ class CartController {
   };
 
   // Update
-
+  removeProductFromUserCart = async (req, res, next) => {
+    new SuccessResponse({
+      message: "Remove product from cart Success!",
+      metadata: await CartService.removeProductFromUserCart({
+        productId: req.body._id,
+        userId: req.user.userId,
+      }),
+    }).send(res);
+  };
   // Delete
   deleteUserCart = async (req, res, next) => {
     new SuccessResponse({

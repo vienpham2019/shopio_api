@@ -6,6 +6,8 @@ const {
   getCartByUserIdAndShopId,
   addProductToOrderProducts,
   deleteUserCart,
+  removeProductFromUserCart,
+  getCartByUserId,
 } = require("../models/cart/cart.repo");
 const { findProduct } = require("../models/product/product.repo");
 
@@ -20,6 +22,13 @@ const { findProduct } = require("../models/product/product.repo");
 
 class CartService {
   // Get
+  static async getUserCart({ userId }) {
+    const foundCart = await getCartByUserId({ userId });
+    if (!foundCart) {
+      throw new NotFoundError(`Cart not found`);
+    }
+    return foundCart;
+  }
   // Create
   static async addToCart({ userId, product }) {
     // check for
@@ -59,9 +68,39 @@ class CartService {
     });
   }
   // Update
-  // Delete
+  static async removeProductFromUserCart({ userId, productId }) {
+    const foundCart = await getCartByUserId({ userId });
+    if (!foundCart) {
+      throw new NotFoundError(`Cart not found`);
+    }
+    if (foundCart?.cart_orders.length === 0) {
+      throw new NotFoundError(`Cart empty!`);
+    }
+    const foundProduct = await findProduct({
+      productId,
+      unSelect: [],
+    });
+    if (!foundProduct) {
+      throw new NotFoundError(`Product not found`);
+    }
 
+    const removeProduct = await removeProductFromUserCart({
+      userId,
+      productId,
+      shopId: foundProduct.product_shopId,
+    });
+
+    if (removeProduct.modifiedCount === 0) {
+      throw new NotFoundError(`Product not in cart`);
+    }
+    return removeProduct;
+  }
+  // Delete
   static async deleteUserCart({ userId }) {
+    const foundCart = await getCartByUserId({ userId });
+    if (!foundCart) {
+      throw new NotFoundError(`Cart not found`);
+    }
     return await deleteUserCart({ userId });
   }
 }

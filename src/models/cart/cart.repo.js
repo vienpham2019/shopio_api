@@ -3,6 +3,8 @@
 const { Types } = require("mongoose");
 const cartModel = require("./cart.model");
 const { CartStateEnum } = require("./cart.enum");
+const { BadRequestError } = require("../../core/error.response");
+const { convertToObjectIdMongoDB } = require("../../utils");
 
 // Get
 const getCartByUserId = async ({ userId }) => {
@@ -108,6 +110,55 @@ const addProductToOrderProducts = async ({ userId, product }) => {
   return await cartModel.findOneAndUpdate(query, update, options);
 };
 
+const removeProductFromUserCart = async ({ userId, productId, shopId }) => {
+  const removeProductFromCart = await cartModel.updateOne(
+    {
+      cart_userId: userId,
+      "cart_orders.order_shopId": shopId,
+      cart_state: CartStateEnum.ACTIVE,
+      "cart_orders.order_products.product_id": productId,
+    },
+    {
+      $pull: {
+        "cart_orders.$[orderElem].order_products": { product_id: productId },
+      },
+      $inc: { cart_count_product: -1 },
+    },
+    {
+      arrayFilters: [{ "orderElem.order_shopId": shopId }],
+      new: true,
+    }
+  );
+
+  if (!removeProductFromCart) {
+    throw new BadRequestError(`Product not found in cart`);
+  }
+
+  // Remove the entire order_products array if it's empty
+  const removeEmptyOrderProducts = await cartModel.updateOne(
+    {
+      cart_userId: convertToObjectIdMongoDB(userId),
+      cart_state: CartStateEnum.ACTIVE,
+      "cart_orders.order_shopId": convertToObjectIdMongoDB(shopId),
+      "cart_orders.order_products": { $exists: true, $eq: [] },
+    },
+    {
+      $pull: {
+        cart_orders: {
+          order_shopId: convertToObjectIdMongoDB(shopId),
+          order_products: { $exists: true, $eq: [] },
+        },
+      },
+    }
+  );
+
+  if (removeEmptyOrderProducts) {
+    return removeEmptyOrderProducts;
+  }
+
+  return removeProductFromCart;
+};
+
 // Delete
 const deleteUserCart = async ({ userId }) => {
   try {
@@ -127,4 +178,5 @@ module.exports = {
   updateProductQuantityByOne,
   addProductToOrderProducts,
   deleteUserCart,
+  removeProductFromUserCart,
 };
